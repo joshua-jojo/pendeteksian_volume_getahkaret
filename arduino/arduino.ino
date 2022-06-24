@@ -1,25 +1,36 @@
 #include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x27, 5, 4);
+#include "HX711.h"
+#define DOUT  A0
+#define CLK  A1
 #define trigger 2
 #define echo 3
 
+LiquidCrystal_I2C lcd(0x27, 5, 4);
+
 long duration;
 int distance;
+HX711 scale(DOUT, CLK);
+float calibration_factor = 650;
+float final_kalibrasi = 110.00;
+int GRAM;
 
 void setup() {
   Serial.begin(57600);
   pinMode(trigger, OUTPUT);
   pinMode(echo, INPUT);
   lcd.begin();
+
+ 
+  scale.set_scale();
+  scale.tare();
+  long zero_factor = scale.read_average();
+  delay(1000);
 }
 
 
 void loop() {
-  String jarak = String(hcsr());
-  tampil_lcd("Jarak : " + jarak+" CM");
-  Serial.println(hcsr());
-  delay(500);
-  
+    tampil_lcd(String(cek_berat()));
+
 }
 
 int tampil_lcd(String data) {
@@ -36,4 +47,44 @@ int hcsr() {
   duration = pulseIn(echo, HIGH);
   distance = duration * 0.034 / 2;
   return distance;
+}
+
+int kalibrasi_berat() {
+  scale.set_scale(calibration_factor);
+  GRAM = scale.get_units(), 4;
+  Serial.print("Reading: ");
+  Serial.print(GRAM);
+  Serial.print(" Gram");
+  Serial.print(" calibration_factor: ");
+  Serial.print(calibration_factor);
+  Serial.println();
+
+  if (Serial.available()) {
+    char temp = Serial.read();
+    if (temp == '+' || temp == 'a')
+      calibration_factor += 0.1;
+    else if (temp == '-' || temp == 'z')
+      calibration_factor -= 0.1;
+    else if (temp == 's')
+      calibration_factor += 10;
+    else if (temp == 'x')
+      calibration_factor -= 10;
+    else if (temp == 'd')
+      calibration_factor += 100;
+    else if (temp == 'c')
+      calibration_factor -= 100;
+    else if (temp == 'f')
+      calibration_factor += 1000;
+    else if (temp == 'v')
+      calibration_factor -= 1000;
+    else if (temp == 't')
+      scale.tare();
+  }
+}
+
+int cek_berat() {
+  scale.set_scale(final_kalibrasi);
+  GRAM = scale.get_units(), 4;
+//  Serial.println(GRAM);
+return GRAM;
 }
