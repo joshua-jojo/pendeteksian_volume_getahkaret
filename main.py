@@ -1,14 +1,13 @@
 import serial
 import hsv
 
-def baca_serial():
-    serialPort = serial.Serial(port = "COM4", baudrate=57600)
-    return int(serialPort.readline())
+port_kamera = 0
 
-def kalibrasi():
-    hsv.kalibrasi()
+def kalibrasi(kamera):
+    hsv.kalibrasi(kamera)
 
 def deteksi(kamera):
     hsv.deteksi(kamera)
 if __name__ == "__main__":
-    deteksi(0)
+    deteksi(port_kamera)
+    # kalibrasi(port_kamera)

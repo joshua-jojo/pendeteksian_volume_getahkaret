@@ -15,12 +15,12 @@ float final_kalibrasi = 110.00;
 int GRAM;
 
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(115200);
   pinMode(trigger, OUTPUT);
   pinMode(echo, INPUT);
   lcd.begin();
 
- 
+
   scale.set_scale();
   scale.tare();
   long zero_factor = scale.read_average();
@@ -29,13 +29,17 @@ void setup() {
 
 
 void loop() {
-    tampil_lcd(String(cek_berat()));
-
+  while (!Serial.available());
+  String data = Serial.readStringUntil('\n')
+  data_array = getValue();
+  tampil_lcd();
 }
 
 int tampil_lcd(String data) {
   lcd.setCursor(0, 0);
   lcd.print(data);
+  delay(5000);
+  lcd.clear();
 }
 
 int hcsr() {
@@ -85,6 +89,6 @@ int kalibrasi_berat() {
 int cek_berat() {
   scale.set_scale(final_kalibrasi);
   GRAM = scale.get_units(), 4;
-//  Serial.println(GRAM);
-return GRAM;
+  //  Serial.println(GRAM);
+  return GRAM;
 }
