@@ -1,7 +1,7 @@
 import serial
 import hsv
 
-port_kamera = 0
+port_kamera = 1
 
 def kalibrasi(kamera):
     hsv.kalibrasi(kamera)

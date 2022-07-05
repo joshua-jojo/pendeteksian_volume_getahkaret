@@ -7,13 +7,18 @@ import imutils
 from scipy.spatial import distance as dist
 import serial
 
-serialPort = serial.Serial(port="COM4", baudrate=115200)
-sleep(2)
+serialPort = serial.Serial(port="COM5", baudrate=115200,timeout=0.1)
+
+def reset(ser):
+    if ser.isOpen() == False:
+            ser.open()
+    ser.reset_input_buffer()
 
 
 def kirim_serial(data, data2,serial):
     serial.write(bytes("%s %s\n"%(data,data2),"utf-8"))
-    sleep(1)
+    reset(serial)
+    sleep(0.1)
 
 
 
@@ -143,7 +148,7 @@ def deteksi(kamera):
 
         contours, hierarchy = cv2.findContours(
             edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        pixelsPerMetric = None
+        pixelsPerMetric = 65
 
         # # loop over the contours individually
         for c in contours:
@@ -212,13 +217,12 @@ def deteksi(kamera):
             cv2.imshow("Final", orig)
         # cv2.imshow("Edge",edges)
 
-            panjang = dimA*2.54
-            lebar = dimB*2.54
+            panjang = dimA*2.54 * 10
+            lebar = dimB*2.54 * 10
             
-
+            kirim_serial(int(panjang), int(lebar),serialPort)
         # kondisi untuk lepas dari perulangan
         if cv2.waitKey(1) & 0xff == ord('q'):
-            kirim_serial(int(panjang), int(lebar),serialPort)
             break
     # except:
         # print("Program dihentikan")

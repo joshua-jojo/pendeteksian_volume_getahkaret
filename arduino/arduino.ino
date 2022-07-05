@@ -30,15 +30,15 @@ void setup() {
 
 void loop() {
   while (!Serial.available());
-  String data = Serial.readStringUntil('\n')
-  data_array = getValue();
-  tampil_lcd();
+  String data = Serial.readStringUntil('\n');
+  delay(10);
+  tampil_lcd(data);
 }
 
 int tampil_lcd(String data) {
   lcd.setCursor(0, 0);
   lcd.print(data);
-  delay(5000);
+  delay(100);
   lcd.clear();
 }
 
