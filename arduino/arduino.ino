@@ -31,14 +31,23 @@ void setup() {
 void loop() {
   while (!Serial.available());
   String data = Serial.readStringUntil('\n');
-  delay(10);
-  tampil_lcd(data);
+  float tinggi = float(hcsr());
+  float data_panjang = panjang(data)/10.00 ;
+  float data_lebar = lebar(data)/10.00 ;
+  float volume = (data_panjang * data_lebar * tinggi) / 100.00 ;
+  float berat_benda = volume * 1000;
+  
+  data = String(berat_benda);
+  tampil_lcd("Volume total",data);
+
 }
 
-int tampil_lcd(String data) {
+int tampil_lcd(String data1,String data2 ) {
   lcd.setCursor(0, 0);
-  lcd.print(data);
-  delay(100);
+  lcd.print(data1);
+  lcd.setCursor(0, 1);
+  lcd.print(data2);
+  delay(10);
   lcd.clear();
 }
 
@@ -50,6 +59,8 @@ int hcsr() {
   digitalWrite(trigger, LOW);
   duration = pulseIn(echo, HIGH);
   distance = duration * 0.034 / 2;
+
+  distance = 40 - distance;
   return distance;
 }
 
@@ -91,4 +102,19 @@ int cek_berat() {
   GRAM = scale.get_units(), 4;
   //  Serial.println(GRAM);
   return GRAM;
+}
+int panjang(String data) {
+  int index = data.indexOf(' ');
+  String data1 = data.substring(0, index);
+
+  int fix;
+  fix = data1.toInt();
+  return fix;
+}
+int lebar(String data) {
+  int index = data.indexOf(' ');
+  String data2 = data.substring(index + 1, data.length());
+  int fix;
+  fix = data2.toInt();
+  return fix;
 }
