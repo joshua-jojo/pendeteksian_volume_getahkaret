@@ -11,7 +11,7 @@ long duration;
 int distance;
 HX711 scale(DOUT, CLK);
 float calibration_factor = 650;
-float final_kalibrasi = 110.00;
+float final_kalibrasi = 97.7;
 int GRAM;
 
 void setup() {
@@ -24,6 +24,7 @@ void setup() {
   scale.set_scale();
   scale.tare();
   long zero_factor = scale.read_average();
+  tampil_lcd("Start...", "");
   delay(1000);
 }
 
@@ -31,23 +32,29 @@ void setup() {
 void loop() {
   while (!Serial.available());
   String data = Serial.readStringUntil('\n');
-  float tinggi = float(hcsr());
-  float data_panjang = panjang(data)/10.00 ;
-  float data_lebar = lebar(data)/10.00 ;
-  float volume = (data_panjang * data_lebar * tinggi) / 100.00 ;
-  float berat_benda = volume * 1000;
-  
-  data = String(berat_benda);
-  tampil_lcd("Volume total",data);
+  //  float tinggi = float(hcsr());
+  //  float data_panjang = panjang(data)/10.0 ;
+  //  float data_lebar = lebar(data)/10.0 ;
+  //  float volume = (data_panjang * data_lebar * tinggi) / 100.0 ;
+  //  float berat_benda = volume * 562.7;
+  //
+  //  data = String(berat_benda);
+  //  tampil_lcd(String(berat_benda),"");
 
+if (String(data) == "kalibrasi "){
+  tampil_lcd("Melakukan","Kalibrasi Berat");
+  while(1){
+   tampil_lcd("kalibrasi : "+String(kalibrasi_berat()),"");
+    }
 }
 
-int tampil_lcd(String data1,String data2 ) {
+}
+int tampil_lcd(String data1, String data2 ) {
   lcd.setCursor(0, 0);
   lcd.print(data1);
   lcd.setCursor(0, 1);
   lcd.print(data2);
-  delay(10);
+  delay(100);
   lcd.clear();
 }
 
@@ -67,12 +74,11 @@ int hcsr() {
 int kalibrasi_berat() {
   scale.set_scale(calibration_factor);
   GRAM = scale.get_units(), 4;
-  Serial.print("Reading: ");
   Serial.print(GRAM);
-  Serial.print(" Gram");
-  Serial.print(" calibration_factor: ");
-  Serial.print(calibration_factor);
-  Serial.println();
+//  Serial.print(" Gram");
+//  Serial.print(" calibration_factor: ");
+//  Serial.print(calibration_factor);
+//  Serial.println();
 
   if (Serial.available()) {
     char temp = Serial.read();
@@ -95,6 +101,7 @@ int kalibrasi_berat() {
     else if (temp == 't')
       scale.tare();
   }
+  return GRAM;
 }
 
 int cek_berat() {
