@@ -7,7 +7,7 @@ import imutils
 from scipy.spatial import distance as dist
 import serial
 
-serialPort = serial.Serial(port="COM5", baudrate=115200,timeout=0.1)
+serialPort = serial.Serial(port="COM8", baudrate=115200,timeout=0.1)
 
 def reset(ser):
     if ser.isOpen() == False:
@@ -119,6 +119,8 @@ def deteksi(kamera):
                 maxVal = len(contours[i])
                 maxI = i
         return maxI
+
+    fps = 125
     while True:
         # membaca frame
         _, frame = cam.read()
@@ -213,14 +215,17 @@ def deteksi(kamera):
                         0.65, (255, 255, 255), 2)
 
         # menampilkan frame res
-            cv2.imshow("Frame", hsv)
-            cv2.imshow("Final", orig)
+            # cv2.imshow("Frame", hsv)
+            # cv2.imshow("Final", orig)
         # cv2.imshow("Edge",edges)
 
             panjang = dimA*2.54 * 10
             lebar = dimB*2.54 * 10
             
-            kirim_serial(int(panjang), int(lebar),serialPort)
+            if fps == 0 :
+                kirim_serial(int(panjang), int(lebar),serialPort)
+                fps = 125
+            fps = fps - 1
         # kondisi untuk lepas dari perulangan
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
